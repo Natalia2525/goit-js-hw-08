@@ -8,9 +8,19 @@ const refs = {
   overlay: document.querySelector('.lightbox__overlay'),
 };
 
+let activeIndex;
+
 // Создание и рендер разметки по массиву данных и  шаблону
 
-function makeGalleryItem({ original, preview, description }, index) {
+const galleryItemsCreate = galleryItems
+  .map(({ preview, original, description }, index) =>
+    makeGalleryItem(preview, original, description, index),
+  )
+  .join('');
+
+refs.gallery.insertAdjacentHTML('beforeend', galleryItemsCreate);
+
+function makeGalleryItem(preview, original, description, index) {
   return `<li class="gallery__item">
     <a
       class="gallery__link"
@@ -20,20 +30,12 @@ function makeGalleryItem({ original, preview, description }, index) {
         class="gallery__image"
         src="${preview}"
                 data-source="${original}"
-                data-index = ${index};
+                data-index = "${index}"
 				alt="${description}"
       />
     </a>
   </li>`;
 }
-
-const galleryItemsCreate = galleryItems
-  .map((preview, original, description, index) =>
-    makeGalleryItem(preview, original, description, index),
-  )
-  .join('');
-
-refs.gallery.insertAdjacentHTML('beforeend', galleryItemsCreate);
 
 function onClickImage(event) {
   event.preventDefault();
@@ -43,6 +45,7 @@ function onClickImage(event) {
   refs.lightboxImg.src = event.target.dataset.source;
   refs.lightboxImg.alt = event.target.alt;
   openModal();
+  activeIndex = Number(event.target.dataset.index);
 }
 
 refs.gallery.addEventListener('click', onClickImage);
@@ -69,8 +72,6 @@ function overlayClick(event) {
 }
 
 function onKeyPress(event) {
-  let activeIndex = Number(event.target.dataset.index);
-
   switch (event.code) {
     case 'Escape':
       closeModal();
