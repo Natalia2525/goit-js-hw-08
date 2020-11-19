@@ -45,29 +45,21 @@ function onClickImage(event) {
   openModal();
 }
 
+refs.gallery.addEventListener('click', onClickImage);
+refs.closeBtn.addEventListener('click', closeModal);
+refs.overlay.addEventListener('click', overlayClick);
+
 function openModal() {
-  window.addEventListener('keydown', onEscKeyPress);
+  window.addEventListener('keydown', onKeyPress);
   refs.lightbox.classList.add('is-open');
 }
 
 function closeModal() {
   refs.lightbox.classList.remove('is-open');
-  window.removeEventListener('keydown', onEscKeyPress);
+  window.removeEventListener('keydown', onKeyPress);
   refs.lightboxImg.src = '';
   refs.lightboxImg.alt = '';
 }
-
-// Закрытие модалки по Escape
-
-function onEscKeyPress(event) {
-  const ESC_KEY_CODE = 'Escape';
-  const isEscKey = event.code === ESC_KEY_CODE;
-
-  if (isEscKey) {
-    closeModal();
-  }
-}
-
 // Закрытие модалки по бекдропу ( оверлей)
 
 function overlayClick(event) {
@@ -76,6 +68,26 @@ function overlayClick(event) {
   }
 }
 
-refs.gallery.addEventListener('click', onClickImage);
-refs.closeBtn.addEventListener('click', closeModal);
-refs.overlay.addEventListener('click', overlayClick);
+function onKeyPress(event) {
+  let activeIndex = Number(event.target.dataset.index);
+
+  switch (event.code) {
+    case 'Escape':
+      closeModal();
+      break;
+
+    case 'ArrowRight':
+      activeIndex + 1 === galleryItems.length
+        ? (activeIndex = 0)
+        : (activeIndex += 1);
+      refs.lightboxImg.src = galleryItems[activeIndex].original;
+      break;
+
+    case 'ArrowLeft':
+      activeIndex === 0
+        ? (activeIndex = galleryItems.length - 1)
+        : (activeIndex -= 1);
+      refs.lightboxImg.src = galleryItems[activeIndex].original;
+      break;
+  }
+}
